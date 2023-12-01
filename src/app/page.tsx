@@ -1,10 +1,12 @@
+import { SubmitButton } from "./users/submit.button";
+
 export default function Home() {
 
   const handleLogin = async (formData: FormData) => {
     'use server'
     console.log(">>> check formData: username ", formData.get('username'))
     console.log(">>> check formData: password ", formData.get('password'))
-
+    await new Promise(resolve => setTimeout(resolve, 5000));
   }
 
   return (
@@ -20,7 +22,7 @@ export default function Home() {
         <br />
         <input type="text" name="password" />
         <br /><br />
-        <input type="submit" value="Submit" />
+        <SubmitButton />
       </form>
     </div>
   )
