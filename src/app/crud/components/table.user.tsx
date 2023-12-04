@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import CreateUser from './create.user';
 import { useState } from 'react';
 import UpdateUser from './update.user';
+import { deleteUserAction } from '../actions';
 
 interface DataType {
     _id: string;
@@ -33,17 +34,8 @@ const TableUser = (props: IProps) => {
     const { replace } = useRouter();
 
     const handleDeleteUser = async (user: any) => {
-        const res = await fetch(
-            `http://localhost:8000/api/v1/users/${user._id}`,
-            {
-                method: "DELETE",
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    "Content-Type": "application/json",
-                },
-            })
+        const d = await deleteUserAction(user, access_token)
 
-        const d = await res.json();
         if (d.data) {
             notification.success({
                 message: "Xóa user thành công."
