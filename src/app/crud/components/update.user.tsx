@@ -3,7 +3,8 @@ import {
     Modal, Input, notification,
     Select, Form, InputNumber, Row, Col
 } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { updateUserAction } from '../actions';
 const { Option } = Select;
 
 interface IProps {
@@ -24,6 +25,8 @@ const UpdateUser = (props: IProps) => {
     } = props;
 
     const [form] = Form.useForm();
+
+    const [isSubmit, setIsSubmit] = useState(false);
 
     useEffect(() => {
         if (dataUpdate) {
@@ -53,22 +56,13 @@ const UpdateUser = (props: IProps) => {
                 name, email, age, gender, role, address
             }
 
-            const res = await fetch(
-                "http://localhost:8000/api/v1/users",
-                {
-                    method: "PATCH",
-                    headers: {
-                        'Authorization': `Bearer ${access_token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(data)
-                })
+            setIsSubmit(true);
 
-            const d = await res.json();
+            const d = await updateUserAction(data, access_token);
             if (d.data) {
                 //success
                 notification.success({
-                    message: "Cập nhật user thành công.",
+                    message: JSON.stringify(d.message),
                 })
                 handleCloseUpdateModal();
             } else {
@@ -78,6 +72,7 @@ const UpdateUser = (props: IProps) => {
                     description: JSON.stringify(d.message)
                 })
             }
+            setIsSubmit(false);
         }
     };
 
@@ -88,6 +83,7 @@ const UpdateUser = (props: IProps) => {
             onOk={() => form.submit()}
             onCancel={() => handleCloseUpdateModal()}
             maskClosable={false}
+            confirmLoading={isSubmit}
         >
             <Form
                 name="basic"
