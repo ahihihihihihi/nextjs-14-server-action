@@ -3,6 +3,8 @@ import {
     Modal, Input, notification,
     Select, Form, InputNumber, Row, Col
 } from 'antd';
+import { useState } from 'react';
+import { createUserAction } from '../actions';
 const { Option } = Select;
 
 interface IProps {
@@ -20,6 +22,8 @@ const CreateUser = (props: IProps) => {
 
     const [form] = Form.useForm();
 
+    const [isSubmit, setIsSubmit] = useState(false);
+
     const handleCloseCreateModal = () => {
         form.resetFields()
         setIsCreateModalOpen(false);
@@ -28,25 +32,17 @@ const CreateUser = (props: IProps) => {
 
     const onFinish = async (values: any) => {
         console.log('Success:', values);
+        setIsSubmit(true);
         const { name, email, password, age, gender, role, address } = values;
 
         const data = { name, email, password, age, gender, role, address };
-        const res = await fetch(
-            "http://localhost:8000/api/v1/users",
-            {
-                method: "POST",
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data)
-            })
 
-        const d = await res.json();
+        const d = await createUserAction(data, access_token);
+
         if (d.data) {
             //success
             notification.success({
-                message: "Tạo mới user thành công.",
+                message: JSON.stringify(d.message),
             })
             handleCloseCreateModal();
         } else {
@@ -56,6 +52,8 @@ const CreateUser = (props: IProps) => {
                 description: JSON.stringify(d.message)
             })
         }
+
+        setIsSubmit(false);
     };
 
     return (
@@ -65,6 +63,7 @@ const CreateUser = (props: IProps) => {
             onOk={() => form.submit()}
             onCancel={() => handleCloseCreateModal()}
             maskClosable={false}
+            confirmLoading={isSubmit}
         >
             <Form
                 name="basic"
